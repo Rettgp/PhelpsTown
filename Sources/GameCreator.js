@@ -120,10 +120,14 @@ myApp.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObjec
 
 function GenerateClasses( game_code )
 {
-    var godfather_entry = { "Godfather" :{ Name: "-", Metadata: "-", Results: "-" } };
-    var mafioso_entry = { "Mafioso" : { Name: "-", Metadata: "-", Results: "-" } };
-    var sheriff_entry = { "Sheriff" : { Name: "-", Metadata: "-", Results: "-" } };
-    var mayor_entry = { "Mayor" : { Name: "-", Metadata: "-", Results: "-" } };
+    var godfather_entry = { "Godfather" : 
+		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
+    var mafioso_entry = { "Mafioso" : 
+		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
+    var sheriff_entry = { "Sheriff" : 
+		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
+    var mayor_entry = { "Mayor" : 
+		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
     m_data_store.Write( godfather_entry, game_code + "/Players" );
     m_data_store.Write( mafioso_entry, game_code + "/Players" );
     m_data_store.Write( sheriff_entry, game_code + "/Players" );
@@ -144,7 +148,8 @@ function GenerateClasses( game_code )
         var index = Math.floor( Math.random() * total_classes.length );
 
         var entry = {};
-        entry[total_classes[index]] = { Name: "-", Metadata: "-", Results: "-" };
+        entry[total_classes[index]] = 
+			{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" };
         m_data_store.Write( entry, game_code + "/Players" );
         total_classes.splice( index, 1 );
     }

@@ -52,6 +52,20 @@ function RemovePlayerVisits( player_name, players )
     return players;
 }
 
+function UpdateStatus( players, player_names, status )
+{
+    for ( var i = 0; i < players.length; ++i )
+    {
+        var player = players[i];
+        if ( player_names.indexOf( player.Name ) != -1 )
+        {
+            player.Status = status;
+        }
+    }
+
+    return players;
+}
+
 function ApplyMetadata( players, player_names, data )
 {
     var key = randomString(
@@ -146,10 +160,77 @@ function ResolveAlerts( players )
 }
 
 //==========================================================================================
+function ResolveKills( players )
+{
+	var resolved_players = players;
+	
+	for ( var i = 0; i < players.length; ++i )
+    {
+		var player = players[i];
+		var attacked = false;
+		var healed = false;
+		var protect = false
+        if ( player.Metadata != "-" )
+        {
+			for ( var data in player.Metadata )
+            {
+                if ( player.Metadata.hasOwnProperty( data ) )
+                {
+                    var effect = player.Metadata[data].Effect;
+                    if ( effect == "kill")
+                    {
+						kill_source = player;
+                    }
+					if ( effect == "heal")
+                    {
+						healed = true;
+					}
+					if ( effect == "protect")
+                    {
+						protect = true;
+					}
+                }
+            }
+			
+			// The Vigilante who killed commits suicide only if 
+			// the victim wasnt healed or someone tried to protect
+			if ( (kill_source != null) && (!healed || protect) )
+			{
+				var dead_vigilantes = [];
+				dead_vigilantes.push( kill_source );
+				resolved_players = 
+					UpdateStatus( resolved_players, dead_vigilantes, "Dead" ); 
+			}
+		}
+	}
+	
+	return resolved_players;
+}
+
+//==========================================================================================
+function ResolveMurders( players )
+{
+	
+}
+
+//==========================================================================================
+function ResolveProtects( players )
+{
+	
+}
+
+//==========================================================================================
+function ResolveHeals( players )
+{
+	
+}
+
+//==========================================================================================
 function ResolveMetadata( players )
 {       
     var resolved_players = ResolveDistracts( players ); 
     resolved_players = ResolveAlerts( resolved_players );
+	resolve_players = ResolveKills( resolved_players );
 
     console.log("Final resolution: " + JSON.stringify(resolved_players));
     return resolved_players;
