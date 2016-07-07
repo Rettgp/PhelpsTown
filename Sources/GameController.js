@@ -30,6 +30,21 @@ console.log("Faction: " + m_faction);
 console.log("Class: " + m_class);
 var myApp = angular.module("PhelpsTown", ["firebase"]);
 
+function Notify( message )
+{
+    $.notify( 
+        { message: message }, 
+        { 
+            type: "info", 
+            placement: { from: "bottom", align: "center" },
+            allow_dismiss: true,
+            animate: {
+                enter: 'animated fadeInDown', exit: 'animated fadeOutUp'
+            }
+        }
+    );
+}
+
 function parseURLParams(url)
 {
     var queryStart = url.indexOf("?") + 1,
@@ -176,6 +191,14 @@ myApp.controller('member_controller', ['$scope', '$firebaseArray', '$firebaseObj
         {
             $scope.members[$scope.members.indexOf(update_child.key)] = update_child;
         }
+        // Notify of changes to current player
+        $scope.OnPlayerUpdated = function ( player_node )
+        {
+            if ( player_node.key == "Results" )
+            {
+                Notify( player_node.val() );
+            }
+        }
 
         m_data_store.ReadAsArray(m_game + "/Players", $firebaseArray, function (players)
         {
@@ -187,6 +210,7 @@ myApp.controller('member_controller', ['$scope', '$firebaseArray', '$firebaseObj
             // Start listening for changes only after we have initialized to prevent
             // collisions and ngrepeat dupes
             m_data_store.ListenForChanges( m_game + "/Players", $scope.OnPlayersUpdated );
+            m_data_store.ListenForChanges( m_game + "/Players/" + m_class, $scope.OnPlayerUpdated );
         });
 
         $scope.isMafia = m_isMafia;
@@ -244,6 +268,18 @@ myApp.controller('master_state_controller', ['$scope', '$firebaseArray', '$fireb
             }
         });
 
+        $scope.ResetPlayers = function()
+        {
+            m_data_store.ReadAsArray( m_game + "/Players", $firebaseArray, function (players)
+            {
+                for ( var i = 0; i < players.length; ++i )
+                {
+                    players[i].Results = "So it Begins...";
+                    players.$save( i );
+                }
+            });
+        }
+
         $scope.ToggleNight = function (e)
         {
             if (m_timer_running)
@@ -285,6 +321,7 @@ myApp.controller('master_state_controller', ['$scope', '$firebaseArray', '$fireb
                         $("#Veteran input:radio").attr("disabled", false);
                     }*/
                     console.log("Night has started");
+                    $scope.ResetPlayers();
                 }
                 else
                 {

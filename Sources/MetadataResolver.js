@@ -89,7 +89,7 @@ function ResolveDistracts( players )
         var visitor = CheckForVisitors( players[i], "distract" ); 
         if ( visitor != "" )
         {
-            resolved_players[i].Results += " Distracted-";
+            resolved_players[i].Results = "You were distracted!";
             resolved_players = RemovePlayerVisits( players[i].Name, resolved_players );
         }
     }
@@ -136,7 +136,7 @@ function ResolveAlerts( players )
                     player.Metadata[data] = "-";
                 }
             }
-            player.Results += "Attempted to Kill intruder: " + players_to_kill;
+            player.Results = "Attempted to Kill intruder(s): " + players_to_kill;
             var entry = { Effect: "kill", Source: player.Name };
             resolved_players = ApplyMetadata( resolved_players, players_to_kill, entry ); 
         }
