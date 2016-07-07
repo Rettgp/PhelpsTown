@@ -1,0 +1,195 @@
+<html ng-app="PhelpsTown">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Angular -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+    <!-- AngularFire -->
+    <script src="https://cdn.firebase.com/libs/angularfire/2.0.1/angularfire.min.js"></script>
+    <script src="Sources/jstorage2.js"></script>
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+    <script src="Sources/Library.js"></script>
+	<script src="Sources/xml2json.js"></script>
+    <script src="modules/Sidebar.js"></script>
+    <script src="Sources/MetadataResolver.js"></script>
+    <script src="Sources/GameController.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="bootstrap-3.3.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="chat.css">
+    <link rel="stylesheet" type="text/css" href="PhelpsTown.css">
+    <link rel="stylesheet" type="text/css" href="modules/Sidebar.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+<div ng-controller="master_state_controller">
+	<div id="wrapper">
+		<div class="overlay"></div>
+
+		<!-- Sidebar -->
+		<nav ng-controller="class_controller"
+			 class="navbar navbar-inverse navbar-fixed-top"
+			 id="sidebar-wrapper"
+			 role="navigation">
+			<ul class="nav sidebar-nav">
+				<li ng-model="class" class="sidebar-brand">
+					<h3>
+						{{class}}
+					</h3>
+				</li>
+				<!-- Navbar hamburger -->
+				<button type="button" class="hamburger is-closed"
+						data-toggle="offcanvas">
+					<span class="hamb-top"></span>
+					<span class="hamb-middle"></span>
+					<span class="hamb-bottom"></span>
+				</button>
+				<li class="dropdown info">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						Description
+						<span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li style="color: white;" class="dropdown-header">
+							{{description}}
+						</li>
+					</ul>
+				</li>
+				<li class="dropdown info">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						Attributes
+						<span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li ng-repeat="attribute in attributes"
+							style="color: white;" class="dropdown-header">
+							{{attribute}}
+						</li>
+					</ul>
+				</li>
+				<li>
+					<!-- Master buttons -->
+					<div>
+						<div class="text-center" style="margin-right: 25%">
+							<button ng-if="game_master" id="nightButton"
+									ng-click="ToggleNight($event)"
+									class="btn btn-primary" id="btn-chat"
+                                    style="width: 100%; margin-bottom: 5%">
+								Start Night
+							</button>
+                            </br>
+							<button ng-if="game_master" id="revealButton"
+									ng-click="Reveal($event)"
+									class="btn btn-primary" id="btn-chat"
+                                    style="width: 100%;">
+								Reveal night visits
+							</button>
+						</div>
+					</div>
+				</li>
+				<h3 class="night-timer is-closed">0:00</h3>
+			</ul>
+		</nav>
+	</div>
+
+	<!-- Content -->
+	<div id="page-content-wrapper">
+
+		<!-- Content container -->
+		<div class="container">
+
+			<!-- Members -->
+			<div id="members" ng-controller="member_controller">
+				<div class="row" style="margin-left: 10%;">
+					<div class="col-sm-6">
+						<div class="row" style="padding: 8px;"
+							 ng-repeat='member in members'>
+
+							<h3 style="display: inline;">
+								<span class="label label-warning" 
+                                    style="display: block; white-space: normal;">
+								<label id={{member.$id}} style="width: 90%;">
+									<label ng-if="game_master">
+									{{member.$id}}: 
+									</label>
+									{{member.Name}}
+									<input type="radio" name="option" disabled="true"
+										   style="width: 20px; height: 20px;
+										   vertical-align: middle;">
+								</label>
+                                </br>
+								<p ng-if="game_master" style="width: 90%;">
+                                    {{member.Results}}
+                                </p>
+								</span>
+							</h3>
+							</br>
+						</div>
+
+						</br>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Chat -->
+		<div class="chat-container" ng-controller="chat_controller">
+			<div class="row">
+				<div class="col-md-5" style="float: right;">
+					<div class="panel panel-primary">
+						<div onclick="" class="panel-heading" data-toggle="collapse"
+							 data-parent="#accordion" href="#collapseOne"
+							 style="padding: 5px;">
+							<strong class="primary-font">
+								Mafia Chat
+							</strong>
+						</div>
+
+						<div class="panel-collapse collapse"
+							 id="collapseOne">
+							<div class="panel-body" id="chat-body">
+								<ul class="chat">
+									<li ng-repeat='msg in messages'
+										class="left clearfix">
+										<div class="chat-body clearfix">
+											<div class="header">
+												<span class="glyphicon glyphicon-comment"></span>
+												<strong class="primary-font">
+													{{msg.from}}
+												</strong>
+											</div>
+											<p>
+												{{msg.body}}
+											</p>
+										</div>
+									</li>
+								</ul>
+							</div>
+
+							<div class="panel-footer" style="margin-bottom: 20px;">
+								<div class="input-group">
+									<input ng-model='msg'
+										   ng-keydown="addMessage($event)"
+										   id="btn-input" type="text"
+										   class="form-control input-sm"
+										   placeholder="Type your message here..."/>
+								<span class="input-group-btn">
+									<button ng-click="addMessageFromClick($event)"
+											class="btn btn-warning btn-sm"
+											id="btn-chat">
+										Send
+									</button>
+								</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+
+</html>
