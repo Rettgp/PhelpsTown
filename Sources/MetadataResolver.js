@@ -66,6 +66,20 @@ function UpdateStatus( players, player_names, status )
     return players;
 }
 
+function UpdateResults( players, player_name, result )
+{
+    for ( var i = 0; i < players.length; ++i )
+    {
+        var player = players[i];
+        if ( player_name == player.Name )
+        {
+            player.Results = result;
+        }
+    }
+
+    return players;  
+}
+
 function ApplyMetadata( players, player_names, data )
 {
     var key = randomString(
@@ -160,38 +174,39 @@ function ResolveAlerts( players )
 }
 
 //==========================================================================================
-function ResolveKills( players )
+function ResolveSuicides( players )
 {
 	var resolved_players = players;
 	
 	for ( var i = 0; i < players.length; ++i )
     {
 		var player = players[i];
-		var attacked = false;
+		var kill_source = null;
 		var healed = false;
 		var protect = false
         if ( player.Metadata != "-" )
         {
 			for ( var data in player.Metadata )
             {
-                if ( player.Metadata.hasOwnProperty( data ) )
+                if ( player.Metadata.hasOwnProperty( data ) && 
+                    player.Faction == "TownMember" )
                 {
                     var effect = player.Metadata[data].Effect;
                     if ( effect == "kill")
                     {
-						kill_source = player;
+                        kill_source = player.Name;
                     }
-					if ( effect == "heal")
+                    if ( effect == "heal")
                     {
-						healed = true;
-					}
-					if ( effect == "protect")
+                        healed = true;
+                    }
+                    if ( effect == "protect")
                     {
-						protect = true;
-					}
+                        protect = true;
+                    }                       
                 }
             }
-			
+            
 			// The Vigilante who killed commits suicide only if 
 			// the victim wasnt healed or someone tried to protect
 			if ( (kill_source != null) && (!healed || protect) )
@@ -200,6 +215,8 @@ function ResolveKills( players )
 				dead_vigilantes.push( kill_source );
 				resolved_players = 
 					UpdateStatus( resolved_players, dead_vigilantes, "Dead" ); 
+                resolved_players = UpdateResults( resolved_players, kill_source, 
+                    "You committed suicide due to murdering your own town member")
 			}
 		}
 	}
@@ -230,7 +247,7 @@ function ResolveMetadata( players )
 {       
     var resolved_players = ResolveDistracts( players ); 
     resolved_players = ResolveAlerts( resolved_players );
-	resolve_players = ResolveKills( resolved_players );
+	resolved_players = ResolveSuicides( resolved_players );
 
     console.log("Final resolution: " + JSON.stringify(resolved_players));
     return resolved_players;

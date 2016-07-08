@@ -121,13 +121,13 @@ myApp.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObjec
 function GenerateClasses( game_code )
 {
     var godfather_entry = { "Godfather" : 
-		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
+		{ Name: "-", Faction: "Mafia", Status: "Alive", Metadata: "-", Results: "-" } };
     var mafioso_entry = { "Mafioso" : 
-		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
+		{ Name: "-", Faction: "Mafia", Status: "Alive", Metadata: "-", Results: "-" } };
     var sheriff_entry = { "Sheriff" : 
-		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
+		{ Name: "-", Faction: "TownMember", Status: "Alive", Metadata: "-", Results: "-" } };
     var mayor_entry = { "Mayor" : 
-		{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" } };
+		{ Name: "-", Faction: "TownMember", Status: "Alive", Metadata: "-", Results: "-" } };
     m_data_store.Write( godfather_entry, game_code + "/Players" );
     m_data_store.Write( mafioso_entry, game_code + "/Players" );
     m_data_store.Write( sheriff_entry, game_code + "/Players" );
@@ -146,10 +146,14 @@ function GenerateClasses( game_code )
     for ( var i = 0; i < m_num_players; ++i ) 
     {
         var index = Math.floor( Math.random() * total_classes.length );
+        var class_name = total_classes[index];
 
         var entry = {};
-        entry[total_classes[index]] = 
-			{ Name: "-", Status: "Alive", Metadata: "-", Results: "-" };
+        entry[class_name] = { 
+            Name: "-", 
+            Faction: m_class_properties[class_name]["faction"], 
+            Status: "Alive", Metadata: "-", Results: "-" 
+        };
         m_data_store.Write( entry, game_code + "/Players" );
         total_classes.splice( index, 1 );
     }
@@ -166,7 +170,7 @@ function FindClass(url, username, context)
             {
                 $.jStorage.set("username", username);
                 $.jStorage.set("class", members[i].$id);
-                $.jStorage.set("faction", "TODO");
+                $.jStorage.set("faction", members[i].Faction);
 
                 window.location.href =
                     "http://localhost:5000/Game.html?game_code=" + m_game_code;
@@ -194,7 +198,7 @@ function FindClass(url, username, context)
                 found = true;
                 $.jStorage.set("username", username);
                 $.jStorage.set("class", members[randomnumber].$id);
-                $.jStorage.set("faction", "TODO");
+                $.jStorage.set("faction", members[randomnumber].Faction);
                 break;
             }
             arr.splice(randomnumber, 1);
