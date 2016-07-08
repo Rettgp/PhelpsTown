@@ -68,7 +68,6 @@ DataStore.prototype.RegisterWatcher = function( root, context, callback )
     var obj = context( ref );
 
     this._watcher = obj.$watch(function() {
-		console.log("Watched: " + obj);
         callback( obj.$value );
     });
 }
