@@ -146,3 +146,5 @@ function Now()
 {
     return Date.now() + m_offset;
 }
+
+FirebaseStore = new DataStore("");

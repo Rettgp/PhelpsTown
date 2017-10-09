@@ -1,73 +1,69 @@
 <html ng-app="PhelpsTown">
+
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- META -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!-- App title -->
+    <title>PhelpsTown</title>
+    <script src="modules/jquery-3.2.1.min.js"></script>
     <!-- Angular -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+    <script src="modules/angular.min.js"></script>
     <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.5.0/firebase.js"></script>
     <!-- AngularFire -->
-    <script src="https://cdn.firebase.com/libs/angularfire/2.0.1/angularfire.min.js"></script>
+    <script src="modules/angularfire.min.js"></script>
+    <!-- Storage modules -->
     <script src="Sources/jstorage2.js"></script>
     <script src="Sources/xml2json.js"></script>
-    <script src="bootstrap-3.3.2-dist/js/bootstrap.js"></script>
-    <script src="Sources/Library.js"></script>
-    <script src="Sources/GameCreator.js"></script>
-    <link rel="stylesheet" type="text/css"
-          href="bootstrap-3.3.2-dist/css/bootstrap.css">
-    <link rel="stylesheet" type="ptext/css" href="chat.css">
-    <!--<link rel="stylesheet" type="text/css" href="PhelpsTown.css">-->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Framework7 -->
+    <script src="Framework7/js/framework7.min.js"></script>
+    <link rel="stylesheet" href="Framework7/css/framework7.ios.min.css">
+    <link rel="stylesheet" href="Framework7/css/framework7.ios.colors.min.css">
 </head>
 
 <body>
-
-<div class="container">
-    <div ng-controller="game_controller">
-        <div class="jumbotron">
-            <h1>Welcome to Phelps Town!</h1>
-
-            <p>Already know of a game in progress?</p>
-
-            <p>
-
-            <div class="input-group input-group-lg col-lg-6">
-                <span class="input-group-addon" id="basic-addon1">
-                    <span class="glyphicon glyphicon-user" aria-hidden="true">
-                    </span>
-                </span>
-                <input ng-model='name' id="nameInput" type="text"
-                       class="form-control" placeholder="Username"
-                       aria-describedby="basic-addon1">
+    <div class="views">
+        <div class="view view-main">
+            <div class="pages">
+                <div class="page" data-page="login-page" ng-controller="game_controller">
+                    <div class="page-content login-screen-content">
+                        <div class="login-screen-title">PhelpsTown</div>
+                        <form>
+                            <div class="list-block">
+                                <ul>
+                                    <li class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label">Username</div>
+                                            <div class="item-input">
+                                                <input id="username" type="text" name="username" placeholder="Your username">
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="list-block">
+                                <ul>
+                                    <li><a ng-click="CreateGame($event)" href="#" class="item-link list-button">Create Game</a></li>
+                                    <li><a ng-click="ExistingGamePrompt($event)" href="#" class="item-link list-button existing-game-prompt">Connect To Existing Game</a></li>
+                                </ul>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="input-group input-group-lg col-lg-6">
-                <span class="input-group-addon" id="basic-addon1">
-                    <span class="glyphicon glyphicon-barcode"
-                          aria-hidden="true">
-                    </span>
-                </span>
-                <input ng-keydown="Connect($event)"
-                       ng-model='game_code' type="text" class="form-control"
-                       placeholder="Game Code"
-                       aria-describedby="basic-addon1">
-                <span class="input-group-btn">
-                    <button ng-click="ConnectFromClick($event)"
-                            type="submit"
-                            class="btn btn-primary">Connect
-                    </button>
-                </span>
-            </div>
-            </p>
         </div>
-
-        <button ng-click="CreateGame($event)" type="submit"
-
-                class="btn btn-block btn-lg btn-success">
-            <span class="glyphicon glyphicon-play"> </span>
-            Create Game
-        </button>
     </div>
-</div>
 
+    <!-- Sources -->
+    <script src="Init.js"></script>
+    <script src="Sources/DataStore.js"></script>
+    <script src="Sources/GameCreator.js"></script>
+    <script src="Sources/MetadataResolver.js"></script>
+    <script src="Sources/GameController.js"></script>
+    <link rel="stylesheet" type="ptext/css" href="chat.css">
 </body>
 
 </html>
