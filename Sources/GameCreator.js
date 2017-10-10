@@ -8,16 +8,13 @@ function randomString(length, chars)
     return result;
 }
 
-$$('.existing-game-prompt').on('click', function ()
-{
-});
-
 App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject',
     function ($scope, $firebaseArray, $firebaseObject)
     {
         $scope.name = $.jStorage.get("username");
         $scope.game_code;
-        $scope.num_players = 8;
+        $scope.min_players = 5;
+        $scope.num_players = 0;
 
         $scope.Connect = function ()
         {
@@ -54,31 +51,46 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
 
         $scope.CreateGame = function (e)
         {
-            $scope.game_code = randomString(5,
-                '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-            var game_master = randomString(10,
-                '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-            var entry = {};
-
-            var username;
-            entry = {
-                MafiaChat: {
-                    "-AAAAAAA": {
-                        from: "PhelpsTown",
-                        body: "Welcome to Phelps Town"
+            fw7.prompt('Enter the number of players excluding you. (Max of 15)', 'Create Game',
+                function (value)
+                {
+                    if ( value < $scope.min_players || isNaN(value) )
+                    {
+                        fw7.alert("A minimum of 5 players is required", "Create a game");
+                        return;
                     }
-                }, Night: false, Timer: 0,
-                GameMaster: game_master
-            }
-            FirebaseStore.Write(entry, $scope.game_code);
-            $scope.name = game_master
-            $.jStorage.set("username", game_master);
-            $.jStorage.set("class", "Game Master");
-            $.jStorage.set("game_code", $scope.game_code);
-            $.jStorage.deleteKey("faction");
+                    $scope.num_players = value;
+                    $scope.game_code = randomString(5,
+                        '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+                    var game_master = randomString(10,
+                        '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+                    var entry = {};
 
-            $scope.GenerateClasses($scope.game_code);
-            MainView.router.loadPage('GamePage.html');
+                    var username;
+                    entry = {
+                        MafiaChat: {
+                            "-AAAAAAA": {
+                                from: "PhelpsTown",
+                                body: "Welcome to Phelps Town"
+                            }
+                        }, Night: false, Timer: 0,
+                        GameMaster: game_master
+                    }
+                    FirebaseStore.Write(entry, $scope.game_code);
+                    $scope.name = game_master
+                    $.jStorage.set("username", game_master);
+                    $.jStorage.set("class", "Game Master");
+                    $.jStorage.set("game_code", $scope.game_code);
+                    $.jStorage.deleteKey("faction");
+
+                    $scope.GenerateClasses($scope.game_code);
+                    MainView.router.loadPage('GamePage.html');
+                },
+                function (value)
+                {
+                    // Cancel chosen
+                }
+            );
         };
 
         $scope.GenerateClasses = function (game_code)
@@ -102,15 +114,18 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
 
             $scope.num_players -= 4;
 
-            // \todo Balance out the number of Town and Mafia classes
-            for (var i = 0; i < $scope.num_players; ++i) 
+            // \todo Balance out the number of Town and Mafia classes??
+            while ( $scope.num_players > 0 && total_classes.length > 0 )
             {
+                console.log(total_classes);
                 var index = Math.floor(Math.random() * total_classes.length);
+                console.log(total_classes[index]);
 
                 var entry = {};
                 entry[total_classes[index]] = { Name: "-", Metadata: "-", Results: "-" };
                 FirebaseStore.Write(entry, game_code + "/Players");
                 total_classes.splice(index, 1);
+                $scope.num_players--;
             }
         }
 
@@ -137,7 +152,7 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
                 {
                     if (arr.length == 0)
                     {
-                        fw7.alert("No open spots in this game");
+                        fw7.alert("No open spots in this game", "PhelpsTown");
                         return false;
                     }
                     var randomnumber =

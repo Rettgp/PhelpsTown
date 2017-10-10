@@ -1,6 +1,8 @@
 var App = angular.module("PhelpsTown", ["firebase"]);
 // Initialize app
-var fw7 = new Framework7();
+var fw7 = new Framework7({
+    swipePanel: "left"
+});
 
 // If we need to use custom DOM library, let's save it to $$ variable:
 var $$ = Dom7;
