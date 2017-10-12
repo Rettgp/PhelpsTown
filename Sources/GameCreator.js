@@ -15,6 +15,12 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
         $scope.game_code;
         $scope.min_players = 5;
         $scope.num_players = 0;
+        console.log("Name: " + $scope.name);
+        
+        if ( $scope.name )
+        {
+            $("#username").val($scope.name);
+        }
 
         $scope.Connect = function ()
         {

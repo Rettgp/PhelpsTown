@@ -96,13 +96,13 @@ DataStore.prototype.RegisterTimer = function( game, offset, running, end_time )
 }
 
 //==============================================================================
-DataStore.prototype.StartTimer = function( game )
+DataStore.prototype.StartTimer = function( game, offset )
 {
     var timer_ref = this.GetRef( game + "/Timer" );
     var running_ref = this.GetRef( game + "/Night" );
 
     running_ref.set( true );
-    timer_ref.set(Now() + 120 * 1000);
+    timer_ref.set(Date.now() + offset + 120 * 1000);
 }
 
 //==============================================================================
@@ -139,12 +139,6 @@ DataStore.prototype.StopTimer = function( game )
 
     running_ref.set( false );
     timer_ref.set(0);
-}
-
-// UTIL TIMER FUNCTIONS
-function Now()
-{
-    return Date.now() + m_offset;
 }
 
 FirebaseStore = new DataStore("");
