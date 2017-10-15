@@ -115,9 +115,27 @@ DataStore.prototype.ListenForAdds = function( root, callback )
 }
 
 //==============================================================================
+DataStore.prototype.ListenForAddsOnRoot = function(callback )
+{
+    var ref = firebase.database().ref();
+    ref.on('child_added', function(data) {
+        callback( data ); 
+    });
+}
+
+//==============================================================================
 DataStore.prototype.ListenForChanges = function( root, callback )
 {
     var ref = this.GetRef( root );
+    ref.on('child_changed', function(data, prev_data) {
+        callback( data ); 
+    });
+}
+
+//==============================================================================
+DataStore.prototype.ListenForAllChanges = function( callback )
+{
+    var ref = firebase.database().ref();
     ref.on('child_changed', function(data, prev_data) {
         callback( data ); 
     });

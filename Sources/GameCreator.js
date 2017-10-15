@@ -8,8 +8,8 @@ function randomString(length, chars)
     return result;
 }
 
-App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject',
-    function ($scope, $firebaseArray, $firebaseObject)
+App.controller('game_controller', ['$scope', '$rootScope', '$firebaseArray', '$firebaseObject',
+    function ($scope, $rootScope, $firebaseArray, $firebaseObject)
     {
         $scope.name = $.jStorage.get("username");
         $scope.game_code;
@@ -30,6 +30,7 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
                 if ($scope.name == game_master)
                 {
                     MainView.router.loadPage('GamePage.html');
+                    $rootScope.$broadcast('Connected');
                 }
                 else
                 {
@@ -46,6 +47,7 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
                 {
                     $scope.name = $("#username").val();
                     $scope.game_code = value;
+                    $.jStorage.set("game_code", $scope.game_code);
                     $scope.Connect();
                 },
                 function (value)
@@ -82,15 +84,16 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
                         }, Night: false, Timer: 0,
                         GameMaster: game_master
                     }
-                    FirebaseStore.Write(entry, $scope.game_code);
                     $scope.name = game_master
                     $.jStorage.set("username", game_master);
                     $.jStorage.set("class", "Game Master");
                     $.jStorage.set("game_code", $scope.game_code);
                     $.jStorage.deleteKey("faction");
 
+                    FirebaseStore.Write(entry, $scope.game_code);
                     $scope.GenerateClasses($scope.game_code);
                     MainView.router.loadPage('GamePage.html');
+                    $rootScope.$broadcast('Connected');
                 },
                 function (value)
                 {
@@ -110,7 +113,6 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
             FirebaseStore.Write(sheriff_entry, game_code + "/Players");
             FirebaseStore.Write(mayor_entry, game_code + "/Players");
             var total_classes = Object.keys(ClassProperties);
-            console.log(total_classes);
 
             // Remove the preassigned classes
             total_classes.splice(total_classes.indexOf("Godfather"), 1);
@@ -123,9 +125,7 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
             // \todo Balance out the number of Town and Mafia classes??
             while ( $scope.num_players > 0 && total_classes.length > 0 )
             {
-                console.log(total_classes);
                 var index = Math.floor(Math.random() * total_classes.length);
-                console.log(total_classes[index]);
 
                 var entry = {};
                 entry[total_classes[index]] = { Name: "-", Metadata: "-", Results: "-" };
@@ -141,13 +141,13 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
             {
                 for (var i = 0; i < members.length; ++i)
                 {
-                    console.log(members[i].Name);
                     if (members[i].Name == username && ($.jStorage.get("username") == username))
                     {
                         $.jStorage.set("username", username);
                         $.jStorage.set("class", members[i].$id);
                         $.jStorage.set("faction", "TODO");
                         MainView.router.loadPage('GamePage.html');
+                        $rootScope.$broadcast('Connected');
                         return;
                     }
                 }
@@ -177,6 +177,7 @@ App.controller('game_controller', ['$scope', '$firebaseArray', '$firebaseObject'
                 }
 
                 MainView.router.loadPage('GamePage.html');
+                $rootScope.$broadcast('Connected');
             });
         }
     }

@@ -26,8 +26,8 @@ function lpad(n)
     }
 }
 
-App.controller('master_state_controller', ['$scope', '$firebaseArray', '$firebaseObject',
-    function ($scope, $firebaseArray, $firebaseObject)
+App.controller('master_state_controller', ['$scope', '$rootScope', '$firebaseArray', '$firebaseObject',
+    function ($scope, $rootScope, $firebaseArray, $firebaseObject)
     {
         $scope.game_master = false;
         $scope.game = $.jStorage.get("game_code");
@@ -39,6 +39,28 @@ App.controller('master_state_controller', ['$scope', '$firebaseArray', '$firebas
         $scope.timer_running = false;
         $scope.timeout = 0;
         $scope.ends_at = 0;
+
+        $rootScope.$on("Connected", function (args) 
+        {
+            console.log("Refresh MasterController");
+            $scope.game_master = false;
+            $scope.game = $.jStorage.get("game_code");
+            $scope.username = $.jStorage.get("username");
+            $scope.class = $.jStorage.get("class");
+
+            if ( !$scope.game )
+            {
+                return;
+            }
+            FirebaseStore.ReadValue($scope.game + "/GameMaster", $firebaseObject, function (game_master)
+            {
+                console.log("Games master: " + game_master);
+                if ($scope.username == game_master)
+                {
+                    $scope.game_master = true;
+                }
+            });
+        });
 
         $scope.CountDown = function()
         {
